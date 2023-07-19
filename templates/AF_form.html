@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>排程餵食</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+  <div class="row" style="margin: 10px">
+    <div class="col-12" style="margin: 10px">
+      <label>預定餵食OR直接餵食：</label>
+      <select id="feedingType" name="feedingType" onchange="toggleFeedingTime()">
+        <option value="direct">直接餵食</option>
+        <option value="scheduled">預定餵食</option>
+      </select>
+      <br>
+      <div id="feedingTimeContainer" style="display: none;">
+        <label>餵食時間：</label>
+        <input type="time" id="feedingTime" value="" class="form-control">
+        <br>
+      </div>
+      <label>餵食量：</label>
+      <input type="number" id="feedingAmount" class="form-control">
+      <br>
+      <button class="btn btn-success btn-block" id="btn_reserve">確定</button>
+    </div>
+  </div>
+
+
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+  <script>
+
+    function initializeLiff(myLiffId) {
+      liff.init({ liffId: myLiffId });
+    }
+
+    function toggleFeedingTime() {
+      var feedingType = document.getElementById("feedingType").value;
+      var feedingTimeContainer = document.getElementById("feedingTimeContainer");
+      var feedingTimeInput = document.getElementById("feedingTime");
+
+      if (feedingType === "direct") {
+        feedingTimeContainer.style.display = "none";
+        feedingTimeInput.value = getCurrentTime(); // 填入當下時間
+      } else {
+        feedingTimeContainer.style.display = "block";
+      }
+    }
+
+    function getCurrentTime() {
+      var now = new Date();
+      var hours = now.getHours().toString().padStart(2, "0");
+      var minutes = now.getMinutes().toString().padStart(2, "0");
+      return hours + ":" + minutes;
+    }
+
+    function reserve(pfeedingType, pfeedingTime, pfeedingAmount) {
+      if (pfeedingType == "scheduled" && pfeedingTime === "") {
+        alert("請選擇餵食時間");
+        return; // 阻止表單提交
+      }
+
+      if (pfeedingAmount == "") {
+        alert("請輸入餵食量");
+        return; // 阻止表單提交
+      }
+
+      var msg = "###";  //回傳訊息字串
+      msg = msg + pfeedingType + "/";
+      msg = msg + pfeedingTime + "/";
+      msg = msg + pfeedingAmount + "/";
+
+      liff.sendMessages([  //推播訊息
+        {
+          type: 'text',
+          text: msg
+        }
+      ])
+        .then(() => {
+          liff.closeWindow();  //關閉視窗
+        });
+    }
+
+    $(document).ready(function () {
+      initializeLiff('{{ liffid }}');  //接收傳遞的 liffid 參數
+      $('#btn_reserve').click(function (e) {  //按下確定鈕
+        reserve($('#feedingType').val(), $('#feedingTime').val(), $('#feedingAmount').val());
+      });
+    });
+  </script>
+
+</body>
+
+</html>

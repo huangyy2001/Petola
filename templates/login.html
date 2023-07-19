@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>產品登入</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="row" style="margin: 10px">
+            <label>帳號</label>
+            <input type="text" id="name" class="form-control" />
+            <br />
+            <label>密碼</label>
+            <input type="text" id="password" value="" class="form-control" />
+            <br />
+            <button class="btn btn-success btn-block" id="btn_reserve">確定</button>
+    </div>
+
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+	<script>
+        function initializeLiff(myLiffId) {
+            liff.init({liffId: myLiffId });
+        }
+
+		function pushMsg(pname, ppassword) {
+			if (pname == '' || ppassword == '' ) {  //資料檢查
+				alert('每個項目都必須輸入！');
+			 	return;
+			}
+			var msg = "!!!";  //回傳訊息字串
+			msg = msg + pname + "/";
+			msg = msg + ppassword + "/";
+			liff.sendMessages([  //推播訊息
+				{ type: 'text',
+				  text: msg
+				}
+			])			
+				.then(() => {
+					liff.closeWindow();  //關閉視窗
+				});
+		}
+
+		$(document).ready(function () {
+			initializeLiff('{{ liffid }}');  //接收傳遞的 liffid 參數
+			$('#btn_reserve').click(function (e) {  //按下確定鈕
+				pushMsg($('#name').val(), $('#password').val());
+			});
+		});
+	</script>
+</body>
+</html>
