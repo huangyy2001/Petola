@@ -9,8 +9,8 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, PostbackEvent, TextSendMessage,TemplateSendMessage, ConfirmTemplate, MessageTemplateAction, ButtonsTemplate,PostbackTemplateAction, URITemplateAction, CarouselTemplate, CarouselColumn,ImageCarouselTemplate, ImageCarouselColumn, ImageSendMessage
 from urllib.parse import parse_qsl
 
-line_bot_api = LineBotApi('FpUQ9LoxdKrSIGbKq8aRdaN9ZGKqO0AgzSIU3pbmSvzfCrrI0yLgjOnZiM6CsyQzCX9YN4BYsAfDJUwPL9SOINqs6jCKSNWzuewyAnDB1G4Yq6yxN/7lhJw/2vi6FVR5lNbJxmOn24i9e2XWHPXdFAdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('44d298103c9d1eda3e3b617f381f65ae')
+line_bot_api = LineBotApi('8ry4aG0vf0yOCHde9WaBIXYTUQnWQOqMnzXq6UZm1EvbRC7YAuFpj723ob7XqCR03WWpbeWqk0RzsCwwr61/Tzd8DDOKv1F9uBrmfWm6YHe+YiCPHXqbk5SNHLUGeuHK7ViYyfvL9a46l6Q5Z4eTXgdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('f1d2d07660f86c3b81def0bb5c6dbff1')
 
 app = Flask(__name__)
 
@@ -23,7 +23,7 @@ def createdb():
     sql = """
     DROP TABLE IF EXISTS pethouse, peteat, petlive,login ,users;
 
-       CREATE TABLE pethouse (
+    CREATE TABLE pethouse (
     id serial Not NULL,
     uid character varying(50) NOT NULL,
     temperature DECIMAL(5, 2),
@@ -74,11 +74,11 @@ def callback():
 
 @app.route('/page1')
 def page1():
-        return render_template('AF_form.html', liffid = '2000165683-DnZvQJY9')
+        return render_template('AF_form.html', liffid = '1661380630-Dkpr3bxe')
 
 @app.route('/page2')
 def page2():
-        return render_template('login.html', liffid = '2000165683-ZRnNwJaQ')	
+        return render_template('login.html', liffid = '1661380630-WD6VZap1')	
 
 
 @handler.add(MessageEvent, message=TextMessage)
