@@ -27,6 +27,26 @@
       <input type="number" id="feedingAmount" class="form-control">
       <br>
       <button class="btn btn-success btn-block" id="btn_reserve">確定</button>
+      <button class="btn btn-success btn-block" id="btn_search">查詢</button>
+    </div>
+  </div>
+
+  <!-- 添加一个表格用于查询结果 -->
+  <div class="row" style="margin: 10px">
+    <div class="col-12">
+      <h3>查詢預定餵食</h3>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>餵食類型</th>
+            <th>餵食時間</th>
+            <th>餵食量</th>
+            <th>修改/刪除</th>
+          </tr>
+        </thead>
+        <tbody id="searchResults">
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -42,21 +62,9 @@
       var feedingType = document.getElementById("feedingType").value;
       var feedingTimeContainer = document.getElementById("feedingTimeContainer");
       var feedingTimeInput = document.getElementById("feedingTime");
-
-      if (feedingType === "direct") {
-        feedingTimeContainer.style.display = "none";
-        feedingTimeInput.value = getCurrentTime(); // 填入當下時間
-      } else {
-        feedingTimeContainer.style.display = "block";
-      }
+      feedingTimeContainer.style.display = "block";
     }
 
-    function getCurrentTime() {
-      var now = new Date();
-      var hours = now.getHours().toString().padStart(2, "0");
-      var minutes = now.getMinutes().toString().padStart(2, "0");
-      return hours + ":" + minutes;
-    }
 
     function reserve(pfeedingType, pfeedingTime, pfeedingAmount) {
       if (pfeedingType == "scheduled" && pfeedingTime === "") {
@@ -91,6 +99,61 @@
         reserve($('#feedingType').val(), $('#feedingTime').val(), $('#feedingAmount').val());
       });
     });
+
+    // 添加一个用于显示查询结果的函数
+    function displaySearchResults(results) {
+      // 清空表格
+      $('#searchResults').empty();
+
+      // 遍历查询结果并添加到表格中
+      for (var i = 0; i < results.length; i++) {
+        var result = results[i];
+        var row = '<tr>';
+        row += '<td>' + result.feedingType + '</td>';
+        row += '<td>' + result.feedingTime + '</td>';
+        row += '<td>' + result.feedingAmount + '</td>';
+        row += '<td><button class="btn btn-primary btn-sm" onclick="editRow(this)">修改</button> <button class="btn btn-danger btn-sm" onclick="deleteRow(this)">删除</button></td>';
+        row += '</tr>';
+        $('#searchResults').append(row);
+      }
+    }
+
+    // 监听查询按钮的点击事件
+    $('#btn_search').click(function (e) {
+      // 这里您可以执行查询操作，然后将结果传递给displaySearchResults函数
+      var results = [
+        {
+          feedingType: 'scheduled',
+          feedingTime: '08:00 AM',
+          feedingAmount: '200g'
+        },
+        // 添加更多查询结果
+      ];
+
+      displaySearchResults(results);
+    });
+
+    // 编辑行
+    function editRow(button) {
+      var row = button.closest('tr');
+      var feedingType = row.cells[0].textContent;
+      var feedingTime = row.cells[1].textContent;
+      var feedingAmount = row.cells[2].textContent;
+
+      // 在这里可以执行编辑逻辑，例如弹出一个模态框供用户编辑数据
+      // 你可以使用上述提到的数据填充模态框中的表单字段
+    }
+
+    // 删除行
+    function deleteRow(button) {
+      var row = button.closest('tr');
+      row.remove();
+
+      // 在这里可以执行删除逻辑，例如向服务器发送请求删除数据
+    }
+
+
+
   </script>
 
 </body>

@@ -14,26 +14,27 @@ def index():
     temperature DECIMAL(5, 2),
     humidity DECIMAL(5, 2),
     fan BOOLEAN,
+    timestamp TIMESTAMP,
     PRIMARY KEY (id));
     
     CREATE TABLE peteat (
     id serial Not NULL,
     uid character varying(50) NOT NULL,
     feederweight character varying(50) NOT NULL,
-    feedertime character varying(50) NOT NULL,
+    feedertime TIMESTAMP,
     PRIMARY KEY (id));
     
     CREATE TABLE petlive (
     id serial Not NULL,
     uid character varying(50) NOT NULL,
-    urllink VARCHAR(255) NOT NULL,
+    urllink character varying(50) NOT NULL,
     PRIMARY KEY (id));
 
     CREATE TABLE login (
     id serial Not NULL,
     uid character varying(50) NOT NULL,
-    petolacode character varying(50) NOT NULL,
-    petolapassword VARCHAR(50) NOT NULL,
+    user_name character varying(50) NOT NULL,
+    user_password character varying(50) NOT NULL,
     PRIMARY KEY (id));
     
     CREATE TABLE users(

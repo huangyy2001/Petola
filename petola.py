@@ -29,26 +29,27 @@ def createdb():
     temperature DECIMAL(5, 2),
     humidity DECIMAL(5, 2),
     fan BOOLEAN,
+    timestamp TIMESTAMP,
     PRIMARY KEY (id));
     
     CREATE TABLE peteat (
     id serial Not NULL,
     uid character varying(50) NOT NULL,
     feederweight character varying(50) NOT NULL,
-    feedertime character varying(50) NOT NULL,
+    feedertime TIMESTAMP,
     PRIMARY KEY (id));
     
     CREATE TABLE petlive (
     id serial Not NULL,
     uid character varying(50) NOT NULL,
-    urllink VARCHAR(255) NOT NULL,
+    urllink character varying(50) NOT NULL,
     PRIMARY KEY (id));
-
+    
     CREATE TABLE login (
     id serial Not NULL,
     uid character varying(50) NOT NULL,
-    petolacode character varying(50) NOT NULL,
-    petolapassword VARCHAR(50) NOT NULL,
+    user_name character varying(50) NOT NULL,
+    user_password character varying(50) NOT NULL,
     PRIMARY KEY (id));
     
     CREATE TABLE users(
@@ -133,7 +134,7 @@ def sendAF(event,user_id): #自動餵食器
        message = TemplateSendMessage(
        alt_text='自動餵食器',
        template = ButtonsTemplate(
-               thumbnail_image_url='https://i.imgur.com/1NSDAvo.jpg',
+               thumbnail_image_url='https://imgur.com/o5v8WUv.png',
                title='自動餵食器',
                text='登入後即可使用功能',
                actions=[
@@ -164,23 +165,36 @@ def sendlive(event): #即時影像
         line_bot_api.reply_message(event.reply_token, message)
     except:
         line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
+
 def sendHE(event):
- try:
-     message = TextSendMessage(
-     text = '現在溫度及濕度為:'
-     )
-     line_bot_api.reply_message(event.reply_token, message)
- except:
-     line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
+    try:
+        # 查询pethouse表中的数据
+        pethouse_query = db.session.execute("SELECT * FROM pethouse ORDER BY id DESC LIMIT 1").fetchone()
 
+        # 查询peteat表中的数据
+        peteat_query = db.session.execute("SELECT * FROM peteat").fetchall()
 
+        # 创建消息文本
+        message_text = "目前艙內：\n"
+        if pethouse_query:
+           fan_status = "開" if pethouse_query['fan'] else "關"
+           message_text += f"溫度: {pethouse_query['temperature']}度, 濕度: {pethouse_query['humidity']}%, 風扇狀態: {fan_status}\n"
+
+        message_text += "\n目前餵食排程：\n"
+        for row in peteat_query:
+            message_text += f"餵食時間: {row['feedertime']}, 餵食量: {row['feederweight']}g\n"
+
+        message = TextSendMessage(text=message_text)
+        line_bot_api.reply_message(event.reply_token, message)
+    except:
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text='發生錯誤！'))
 
 def manageForm_login(event, mtext, user_id):
     try:
         flist = mtext[3:].split('/')
         petolacode = flist[0]  #取得輸入資料
         petolapassword = flist[1]
-        sql_cmd = "insert into login (uid, petolacode, petolapassword) values('" + user_id + "', '" + petolacode + "', '" + petolapassword +"');"
+        sql_cmd = "insert into login (uid, user_name, user_password) values('" + user_id + "', '" + petolacode + "', '" + petolapassword +"');"
         db.engine.execute(sql_cmd)        
         text1 = '登入成功' 
 
@@ -205,7 +219,7 @@ def manageForm_AF(event, mtext, user_id):
         text1 += "\n餵食時間：" + feedingTime
         text1 += "\n餵食量：" + feedingAmount
        
-        message = TextSendMessage(  #顯示訂房資料
+        message = TextSendMessage(
             text = text1
         )
         line_bot_api.reply_message(event.reply_token,message)
